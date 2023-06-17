@@ -29,21 +29,19 @@ app.use(bodyParser.json());
 
 app.post('/api/shorturl', function middleware(req, res, next) {
   const url = new URL(req.body.url)
-  console.log(url.hostname, url.pathname);
-  dns.lookup(url.host, (err, address, family) => {
+  console.log(url.host, url.hostname, url.pathname);
+  dns.lookup(url.hostname, (err, address, family) => {
     if (err) {
-      console.error(err);
       req.origUrl = null;
     } else {
       req.origUrl = req.body.url;
     }
+    next();
   });
-  next();
 },
   function (req, res) {
-    console.log("origURL: ", req.origUrl);
     let response;
-    if (req.origUrl === undefined) {
+    if (req.origUrl === null) {
       response = { error: "invalid url" };
     }
     else {
